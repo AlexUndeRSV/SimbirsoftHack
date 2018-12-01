@@ -1,5 +1,6 @@
 package com.simbirsoft.testmaps.mvp.presenters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.arellomobile.mvp.InjectViewState;
@@ -100,6 +101,7 @@ public class MapsPresenter extends MvpPresenter<MapsView> {
 
 
 
+    @SuppressLint("CheckResult")
     public void takeMarker(String key) {
         rest.takeMarker(TEAM_ID, key)
                 .subscribeOn(Schedulers.io())

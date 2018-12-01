@@ -40,9 +40,37 @@
                 android:layout_marginLeft="16dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/zombie" />
-
             <TextView
                 android:id="@+id/zombie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/jacket" />
+
+            <TextView
+                android:id="@+id/jackets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/flamethrower" />
+
+            <TextView
+                android:id="@+id/flamethrowers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
@@ -67,6 +95,7 @@
         android:layout_above="@+id/my_location"
         android:layout_alignLeft="@+id/my_location"
         android:layout_marginBottom="16dp"
+        android:background="#123"
         android:src="@drawable/ic_marker" />
 
     <ImageView
@@ -77,6 +106,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
+        android:background="#133"
         android:src="@android:drawable/ic_menu_mylocation" />
 
 </RelativeLayout>
