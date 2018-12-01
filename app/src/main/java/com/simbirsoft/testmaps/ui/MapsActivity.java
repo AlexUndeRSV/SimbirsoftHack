@@ -32,11 +32,14 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.simbirsoft.testmaps.MapApplication;
 import com.simbirsoft.testmaps.R;
 import com.simbirsoft.testmaps.entities.MarkerEntity;
 import com.simbirsoft.testmaps.entities.TeamData;
 import com.simbirsoft.testmaps.gps.LocationController;
+import com.simbirsoft.testmaps.model.ModelNotification;
 import com.simbirsoft.testmaps.mvp.presenters.MapsPresenter;
 import com.simbirsoft.testmaps.mvp.views.MapsView;
 
@@ -118,10 +121,13 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
     }
 
     public void createNotification(String message) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        ModelNotification model = gson.fromJson(message,ModelNotification.class);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_current_pose)
                 .setContentTitle("Нашествие снеговиков")
-                .setContentText(message)
+                .setContentText(model.getHint())
 //                .setLargeIcon()
 //                .setStyle(new NotificationCompat.BigPictureStyle()
 //                        .bigPicture(null)
@@ -248,6 +254,7 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
 
     @Override
     public void onTakeMessageHints(String messages) {
+
         if (messages != null && messages.length() > 2)
             createNotification(messages);
     }
