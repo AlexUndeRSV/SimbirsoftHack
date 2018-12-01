@@ -21,4 +21,7 @@ public interface IRestService {
     Flowable<BaseResponse> takeMarker(@Query("uid_team") String team, @Query("key_marker") String keyMarker);
 
     //TODO: Добавить запрос для получения подсказок http://139.59.129.2/quest_api/get_hints?uid_team=[номер_команды]
+
+    @GET("/quest_api/get_hints")
+    Flowable<BaseResponse> takeMessageHints(@Query("uid_team") String team);
 }
