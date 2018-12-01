@@ -13,6 +13,7 @@ public interface MapsView extends MvpView {
     void onTeamData(TeamData data);
     void onMarkersLoad(List<MarkerEntity> markers);
     void onTakeMarker(String msg);
+    void onTakeMessageHints(String messages);
     //TODO: добавить метод, вызываемый, после загрузки подсказок
     void onError(Throwable t);
 }

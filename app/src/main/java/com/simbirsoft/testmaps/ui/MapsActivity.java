@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -59,6 +61,7 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
     private TextView zombieText;
     private TextView jacketsTxt;
     private TextView flameTxt;
+    private MarkerEntity marks;
 
     private boolean isLocationReady = false;
 
@@ -84,6 +87,7 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         jacketsTxt = findViewById(R.id.jackets);
         flameTxt = findViewById(R.id.flamethrowers);
 
+
         findViewById(R.id.my_location).setOnClickListener(l -> {
             //TODO: Добавить перемещение на текущие координаты
             Double lng = locationController.getCurrentLocation().longitude;
@@ -95,13 +99,30 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         findViewById(R.id.my_markers).setOnClickListener(l -> {
             //TODO: Добавить такое перемещение, чтобы все метки оказались в границе видимости экрана
 //            map.animateCamera(CameraUpdateFactory.newCameraPosition());
-
+            if (marks != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(marks.getLat(), marks.getLon()), 17.0f)
+                );
+            }
 
         });
 
         presenter.clearTasks();
 
         //TODO: Если реализуете функцию для получение подсказок, вызывать здесь
+        presenter.getMarkers();
+        presenter.getMessageHints();
+//        locationController.setLocationListener(new LocationController.OnLocationChangedListener() {
+//            @Override
+//            public void onLocationChanged(LatLng location) {
+//                map.addMarker(new MarkerOptions()
+//                        .position(location)
+//                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_current_pose))
+//                );
+//
+//
+//            }
+//        });
 
     }
 
@@ -128,7 +149,6 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         switch (item.getItemId()) {
             case R.id.send:
                 //TODO: Добавить функционал для взятия метки. Для отправки метки использовать метод
-                // presenter.takeMarker(ваша метка);
                 readBarcode();
                 break;
             case R.id.hybrid:
@@ -179,18 +199,38 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         }
         //TODO: Добавить отображение на карте текущий позиции
 
-//        setMarker();
+
     }
+
 
     @Override
     public void onMarkersLoad(List<MarkerEntity> markerEntities) {
         //TODO: Добавить маркеры на карту
+        marks = markerEntities.get(0);
         for (MarkerEntity markerEntity : markerEntities) {
-            map.addMarker(new MarkerOptions()
-                    .draggable(false)
-                    .position(new LatLng(markerEntity.getLat(), markerEntity.getLon()))
-                    .icon(BitmapDescriptorFactory.fromBitmap(markerEntity.getBitmap()))
-            );
+            LatLng coordinatorsObj = new LatLng(markerEntity.getLat(), markerEntity.getLon());
+            if (markerEntity.getType().equals("zombie")) {
+                map.addMarker(new MarkerOptions()
+                        .draggable(false)
+                        .position(coordinatorsObj)
+                        .icon(BitmapDescriptorFactory.fromBitmap(markerEntity.getBitmap()))
+
+                );
+                map.addCircle(new CircleOptions()
+                        .center(coordinatorsObj)
+                        .radius(markerEntity.getRadius())
+                        .fillColor(Color.BLUE)
+                        .strokeColor(Color.RED)
+                );
+            } else {
+                map.addMarker(new MarkerOptions()
+                        .draggable(false)
+                        .position(new LatLng(markerEntity.getLat(), markerEntity.getLon()))
+                        .icon(BitmapDescriptorFactory.fromBitmap(markerEntity.getBitmap()))
+
+                );
+            }
+
 
         }
     }
@@ -198,6 +238,11 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
     @Override
     public void onTakeMarker(String msg) {
         showToast(msg);
+    }
+
+    @Override
+    public void onTakeMessageHints(String messages) {
+        Toast.makeText(this, messages, Toast.LENGTH_LONG).show();
     }
 
     @Override

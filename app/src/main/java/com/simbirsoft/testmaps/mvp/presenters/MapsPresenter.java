@@ -98,6 +98,36 @@ public class MapsPresenter extends MvpPresenter<MapsView> {
     }
 
     //TODO: Добавить метод для загрузки подсказок
+    public void getMessageHints() {
+        disposables.add(rest.takeMessageHints(TEAM_ID)
+                .flatMap(response -> {
+                    if (response.getSuccess() == SUCCESS) {
+                        return Flowable.just(response.getData());
+                    } else {
+                        return Flowable.error(new Exception(response.getMessage()));
+                    }
+                })
+//                .flatMap(Flowable::fromIterable)
+//                .subscribeOn(Schedulers.io())
+                /*.map(marker -> {
+//                    if (marker.getImageUrl() != null) {
+//                        marker.setBitmap(BitmapUtils.loadImage(context, marker.getImageUrl(), 80));
+//                    }
+//                    return marker;
+                    return "";
+                })*/
+                .map(Object::toString)
+//                .toList()
+//                .toFlowable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(t -> getViewState().onError(t))
+                .repeatWhen(t -> t.delay(STANDARD_DELAY, TimeUnit.SECONDS))
+                .retryWhen(t -> t.delay(STANDARD_DELAY, TimeUnit.SECONDS))
+                .subscribe(message ->
+                        getViewState().onTakeMessageHints(message))
+        );
+    }
+
 
     @SuppressLint("CheckResult")
     public void takeMarker(String key) {
