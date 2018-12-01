@@ -1,7 +1,9 @@
 package com.simbirsoft.testmaps.ui;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +25,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
 import com.simbirsoft.testmaps.MapApplication;
 import com.simbirsoft.testmaps.R;
 import com.simbirsoft.testmaps.entities.MarkerEntity;
@@ -39,6 +44,8 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         OnMapReadyCallback, LocationController.OnLocationChangedListener {
 
     private static final int LOCATION_PERMISSION = 387;
+
+    private final int REQUEST_CODE = 1;
 
     @InjectPresenter
     MapsPresenter presenter;
@@ -122,6 +129,7 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
             case R.id.send:
                 //TODO: Добавить функционал для взятия метки. Для отправки метки использовать метод
                 // presenter.takeMarker(ваша метка);
+                readBarcode();
                 break;
             case R.id.hybrid:
                 map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
@@ -134,6 +142,25 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
                 break;
         }
         return true;
+    }
+
+    private void readBarcode() {
+        Intent rbcIntent = new Intent(MapsActivity.this, ScanBarcodeActivity.class);
+        startActivityForResult(rbcIntent, REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                if(data != null){
+                    Barcode barcode = data.getParcelableExtra("barcode");
+                    presenter.takeMarker(barcode.displayValue);
+                }else
+                    showToast("Barcode isn't found");
+
+            }
+        }
     }
 
     @Override
@@ -152,6 +179,7 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         }
         //TODO: Добавить отображение на карте текущий позиции
 
+//        setMarker();
     }
 
     @Override
@@ -201,5 +229,14 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
 
     private void showToast(String msg) {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setMarker(LatLng oldLocation, LatLng newLocation) {
+        map.addMarker(new MarkerOptions()
+                .position(oldLocation)).remove();
+
+        map.addMarker(new MarkerOptions()
+                .position(newLocation)
+                .draggable(false));
     }
 }

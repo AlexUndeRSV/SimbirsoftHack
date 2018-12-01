@@ -99,8 +99,6 @@ public class MapsPresenter extends MvpPresenter<MapsView> {
 
     //TODO: Добавить метод для загрузки подсказок
 
-
-
     @SuppressLint("CheckResult")
     public void takeMarker(String key) {
         rest.takeMarker(TEAM_ID, key)
