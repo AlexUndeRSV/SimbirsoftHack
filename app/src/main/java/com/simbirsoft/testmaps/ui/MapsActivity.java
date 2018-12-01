@@ -1,12 +1,15 @@
 package com.simbirsoft.testmaps.ui;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -41,6 +44,7 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         OnMapReadyCallback, LocationController.OnLocationChangedListener {
 
     private static final int LOCATION_PERMISSION = 387;
+    private static final String CHANNEL_ID = "message";
 
     @InjectPresenter
     MapsPresenter presenter;
@@ -105,18 +109,21 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
         //TODO: Если реализуете функцию для получение подсказок, вызывать здесь
         presenter.getMarkers();
         presenter.getMessageHints();
-//        locationController.setLocationListener(new LocationController.OnLocationChangedListener() {
-//            @Override
-//            public void onLocationChanged(LatLng location) {
-//                map.addMarker(new MarkerOptions()
-//                        .position(location)
-//                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_current_pose))
-//                );
-//
-//
-//            }
-//        });
+    }
 
+    public void createNotification(String message) {
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_current_pose)
+                .setContentTitle("Нашествие снеговиков")
+                .setContentText(message)
+//                .setLargeIcon()
+//                .setStyle(new NotificationCompat.BigPictureStyle()
+//                        .bigPicture(null)
+//                        .bigLargeIcon(null))
+                .build();
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        assert notificationManager != null;
+        notificationManager.notify(0, notification);
     }
 
     @Override
@@ -216,7 +223,8 @@ public class MapsActivity extends MvpAppCompatActivity implements MapsView,
 
     @Override
     public void onTakeMessageHints(String messages) {
-        Toast.makeText(this, messages, Toast.LENGTH_LONG).show();
+        if (messages != null && messages.length() > 2)
+            createNotification(messages);
     }
 
     @Override
